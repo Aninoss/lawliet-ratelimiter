@@ -20,10 +20,17 @@ public class RestService {
     }
 
     @GET
-    @Path("/ratelimit")
+    @Path("/absolute")
     @Produces(MediaType.TEXT_PLAIN)
-    public String ratelimit() {
-        return String.valueOf(ratelimiter.nextRequest());
+    public int absolute() {
+        return ratelimiter.nextRequestAbsolute();
+    }
+
+    @GET
+    @Path("/relative")
+    @Produces(MediaType.TEXT_PLAIN)
+    public int relative() {
+        return ratelimiter.nextRequestRelative();
     }
 
 }
