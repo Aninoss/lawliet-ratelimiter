@@ -2,31 +2,18 @@ package core;
 
 public class Ratelimiter {
 
-    private final int requestsPerSecond;
-    private int frameRequests = 0;
-    private int frameSecond = 0;
+    private final long intervalTimeNanos;
+    private long nextRequest = 0;
 
     public Ratelimiter(int requestsPerSecond) {
-        this.requestsPerSecond = requestsPerSecond;
-    }
-
-    public synchronized int nextRequestAbsolute() {
-        int currentSecond = (int) (System.currentTimeMillis() / 1_000);
-        if (currentSecond > frameSecond) {
-            frameSecond = currentSecond;
-            frameRequests = 1;
-        } else if (++frameRequests > requestsPerSecond) {
-            frameSecond++;
-            frameRequests = 1;
-        }
-
-        return frameSecond;
+        this.intervalTimeNanos = 1_000_000_000L / requestsPerSecond;
     }
 
     public synchronized int nextRequestRelative() {
-        long nextRequest = nextRequestAbsolute();
-        long sleepTimeMillis = nextRequest * 1_000 - System.currentTimeMillis();
-        return (int) Math.max(0, sleepTimeMillis);
+        long currentTime = System.nanoTime();
+        long waitingTime = Math.max(0, nextRequest - currentTime);
+        nextRequest = Math.max(currentTime + intervalTimeNanos, nextRequest + intervalTimeNanos);
+        return (int) (waitingTime / 1_000_000);
     }
 
 }

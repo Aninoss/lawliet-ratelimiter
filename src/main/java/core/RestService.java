@@ -20,13 +20,6 @@ public class RestService {
     }
 
     @GET
-    @Path("/absolute")
-    @Produces(MediaType.TEXT_PLAIN)
-    public int absolute() {
-        return ratelimiter.nextRequestAbsolute();
-    }
-
-    @GET
     @Path("/relative")
     @Produces(MediaType.TEXT_PLAIN)
     public int relative() {
